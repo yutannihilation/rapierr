@@ -23,11 +23,17 @@ You can install the development version of rpr2dr like so:
 
 ``` r
 library(rpr2dr)
+library(ggplot2)
 
 d <- bouncing_ball()
+d <- d[1:200,]
 
 for (i in seq_len(nrow(d))) {
-  plot(d[i, ], ylim = c(0, 1), cex = 4)
+  p <- ggplot(d[i, ]) +
+    geom_point(aes(x, y), size = 10) +
+    scale_size_identity() +
+    coord_cartesian(ylim = c(0, 1))
+  plot(p)
 }
 ```
 
