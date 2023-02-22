@@ -1,3 +1,5 @@
+CRATE_NAME = rapierr
+
 TARGET = $(subst 64,x86_64,$(subst 32,i686,$(WIN)))-pc-windows-gnu
 TARGET_DIR = ./rust/target
 
@@ -9,8 +11,8 @@ else
 	PROFILE_FLAG =
 endif
 
-STATLIB = $(LIBDIR)/librpr2dr.a
-PKG_LIBS = -L$(LIBDIR) -lrpr2dr -lws2_32 -ladvapi32 -luserenv -lbcrypt
+STATLIB = $(LIBDIR)/lib$(CRATE_NAME).a
+PKG_LIBS = -L$(LIBDIR) -l$(CRATE_NAME) -lws2_32 -ladvapi32 -luserenv -lbcrypt
 
 all: C_clean
 

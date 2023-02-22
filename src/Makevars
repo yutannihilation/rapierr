@@ -1,3 +1,5 @@
+CRATE_NAME = rapierr
+
 TARGET_DIR = ./rust/target
 
 ifeq ($(origin NOT_CRAN), "undefined")
@@ -8,8 +10,8 @@ else
 	PROFILE_FLAG =
 endif
 
-STATLIB = $(LIBDIR)/librpr2dr.a
-PKG_LIBS = -L$(LIBDIR) -lrpr2dr
+STATLIB = $(LIBDIR)/lib$(CRATE_NAME).a
+PKG_LIBS = -L$(LIBDIR) -l$(CRATE_NAME)
 
 all: C_clean
 

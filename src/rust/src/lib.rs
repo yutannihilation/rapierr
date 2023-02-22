@@ -97,6 +97,6 @@ fn bouncing_ball() -> Robj {
 // This ensures exported functions are registered with R.
 // See corresponding C code in `entrypoint.c`.
 extendr_module! {
-    mod rpr2dr;
+    mod rapierr;
     fn bouncing_ball;
 }

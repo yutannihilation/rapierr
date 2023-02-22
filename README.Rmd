@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 
 ## Installation
 
-You can install the development version of rpr2dr like so:
+You can install the development version of rapierr like so:
 
 ``` r
 # FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
@@ -37,7 +37,7 @@ You can install the development version of rpr2dr like so:
 #| interval: !expr 1/60
 #| device: ragg_png
 #| 
-library(rpr2dr)
+library(rapierr)
 library(ggplot2)
 
 d <- bouncing_ball()

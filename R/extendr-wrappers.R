@@ -4,11 +4,11 @@
 
 #
 # This file was created with the following call:
-#   .Call("wrap__make_rpr2dr_wrappers", use_symbols = TRUE, package_name = "rpr2dr")
+#   .Call("wrap__make_rapierr_wrappers", use_symbols = TRUE, package_name = "rapierr")
 
 #' @docType package
 #' @usage NULL
-#' @useDynLib rpr2dr, .registration = TRUE
+#' @useDynLib rapierr, .registration = TRUE
 NULL
 
 #' Return rapier results
