@@ -13,7 +13,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Rapier 2D for R
+# rapierr
+
+Bring Rapier 2D functionality to R
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -27,7 +29,7 @@ knitr::opts_chunk$set(
 You can install the development version of rapierr like so:
 
 ``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+remotes::install_github("yutannihilation/rapierr")
 ```
 
 ## Example

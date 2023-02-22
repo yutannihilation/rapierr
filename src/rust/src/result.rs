@@ -5,13 +5,13 @@ use std::convert::TryFrom;
 /// An intermediate form to convert to tibble.
 pub struct ResultTibble {
     // Frame (the simulation usually runs at 60FPS)
-    pub frame: Vec<i32>,
+    pub frame: Integers,
     // Index of the object
-    pub index: Vec<i32>,
+    pub index: Integers,
     // Unscaled position of x.
-    pub x: Vec<f32>,
+    pub x: Doubles,
     // Unscaled position of y.
-    pub y: Vec<f32>,
+    pub y: Doubles,
 }
 
 impl TryFrom<ResultTibble> for Robj {

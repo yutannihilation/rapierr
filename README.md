@@ -1,7 +1,9 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Rapier 2D for R
+# rapierr
+
+Bring Rapier 2D functionality to R
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -13,16 +15,16 @@ engines for the Rust programming language.
 
 ## Installation
 
-You can install the development version of rpr2dr like so:
+You can install the development version of rapierr like so:
 
 ``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+remotes::install_github("yutannihilation/rapierr")
 ```
 
 ## Example
 
 ``` r
-library(rpr2dr)
+library(rapierr)
 library(ggplot2)
 
 d <- bouncing_ball()

@@ -10,15 +10,17 @@ fn bouncing_ball_inner() -> Robj {
     /* Create the ground. */
     let collider_bottom = ColliderBuilder::cuboid(100.0, 0.0)
         .translation(vector![-50.0, 0.0])
+        .restitution(0.70)
         .build();
     let collider_left = ColliderBuilder::cuboid(100.0, 0.0)
-        .rotation(90.0)
-        .translation(vector![-0.1, 0.0])
+        .rotation(std::f32::consts::PI * 0.5)
+        .translation(vector![-0.2, 0.0])
+        .restitution(0.70)
         .build();
     collider_set.insert(collider_bottom);
     collider_set.insert(collider_left);
 
-    let pos = &[vector![0.0, 1.0], vector![0.01, 0.8]];
+    let pos = &[vector![0.0, 1.0], vector![0.02, 0.8]];
 
     let handles = pos.map(|v| {
         /* Create the bouncing ball. */
@@ -47,15 +49,17 @@ fn bouncing_ball_inner() -> Robj {
     let physics_hooks = ();
     let event_handler = ();
 
-    const LEN: usize = 100;
+    const FRAMES: usize = 200;
 
-    let mut frame: Vec<i32> = Vec::with_capacity(LEN);
-    let mut index: Vec<i32> = Vec::with_capacity(LEN);
-    let mut x: Vec<f32> = Vec::with_capacity(LEN);
-    let mut y: Vec<f32> = Vec::with_capacity(LEN);
+    let mut frame = extendr_api::Integers::new(FRAMES * pos.len());
+    let mut index = extendr_api::Integers::new(FRAMES * pos.len());
+    let mut x = extendr_api::Doubles::new(FRAMES * pos.len());
+    let mut y = extendr_api::Doubles::new(FRAMES * pos.len());
+
+    let mut i = 0_usize;
 
     /* Run the game loop, stepping the simulation once per frame. */
-    for i in 0..LEN {
+    for f in 0..FRAMES {
         physics_pipeline.step(
             &gravity,
             &integration_parameters,
@@ -74,10 +78,12 @@ fn bouncing_ball_inner() -> Robj {
 
         for &h in &handles {
             let ball_body = &rigid_body_set[h];
-            frame.push(i as _);
-            index.push(h.index() as _);
-            x.push(ball_body.translation().x);
-            y.push(ball_body.translation().y);
+            frame.set_elt(i, (f as i32).into());
+            index.set_elt(i, (h.index() as i32).into());
+            x.set_elt(i, (ball_body.translation().x as f64).into());
+            y.set_elt(i, (ball_body.translation().y as f64).into());
+
+            i += 1;
         }
     }
 
