@@ -26,14 +26,15 @@ library(rpr2dr)
 library(ggplot2)
 
 d <- bouncing_ball()
-d <- d[1:200,]
+
+p <- ggplot() +
+  ggforce::geom_circle(aes(x0 = x, y0 = y, r = 0.05)) +
+  scale_size_identity() +
+  theme_minimal() +
+  coord_equal(xlim = c(-0.5, 0.5), ylim = c(0, 1))
 
 for (i in seq_len(nrow(d))) {
-  p <- ggplot(d[i, ]) +
-    geom_point(aes(x, y), size = 10) +
-    scale_size_identity() +
-    coord_cartesian(ylim = c(0, 1))
-  plot(p)
+  plot(p %+% d[i, ])
 }
 ```
 
