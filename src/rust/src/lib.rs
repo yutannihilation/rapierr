@@ -8,7 +8,9 @@ fn bouncing_ball_inner() -> Robj {
     let mut collider_set = ColliderSet::new();
 
     /* Create the ground. */
-    let collider_bottom = ColliderBuilder::cuboid(100.0, 0.0).build();
+    let collider_bottom = ColliderBuilder::cuboid(100.0, 0.0)
+        .translation(vector![-50.0, 0.0])
+        .build();
     let collider_left = ColliderBuilder::cuboid(100.0, 0.0)
         .rotation(90.0)
         .translation(vector![-0.1, 0.0])
@@ -21,7 +23,10 @@ fn bouncing_ball_inner() -> Robj {
     let handles = pos.map(|v| {
         /* Create the bouncing ball. */
         let rigid_body = RigidBodyBuilder::dynamic().translation(v).build();
-        let collider = ColliderBuilder::ball(0.05).restitution(0.95).build();
+        let collider = ColliderBuilder::ball(0.07)
+            .restitution(0.97)
+            .restitution_combine_rule(CoefficientCombineRule::Multiply)
+            .build();
         let ball_body_handle = rigid_body_set.insert(rigid_body);
         collider_set.insert_with_parent(collider, ball_body_handle, &mut rigid_body_set);
 
