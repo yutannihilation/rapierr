@@ -1,5 +1,5 @@
 use extendr_api::prelude::*;
-use rapier2d::prelude::*;
+use rapier2d::{parry::partitioning::IndexedData, prelude::*};
 
 mod result;
 
@@ -8,16 +8,22 @@ fn bouncing_ball_inner() -> Robj {
     let mut collider_set = ColliderSet::new();
 
     /* Create the ground. */
-    let collider = ColliderBuilder::cuboid(100.0, 0.0).build();
-    collider_set.insert(collider);
+    let collider_bottom = ColliderBuilder::cuboid(100.0, 0.0).build();
+    let collider_left = ColliderBuilder::cuboid(-0.5, 100.0).build();
+    collider_set.insert(collider_bottom);
+    collider_set.insert(collider_left);
 
-    /* Create the bouncing ball. */
-    let rigid_body = RigidBodyBuilder::dynamic()
-        .translation(vector![0.0, 1.0])
-        .build();
-    let collider = ColliderBuilder::ball(0.05).restitution(0.85).build();
-    let ball_body_handle = rigid_body_set.insert(rigid_body);
-    collider_set.insert_with_parent(collider, ball_body_handle, &mut rigid_body_set);
+    let pos = &[vector![0.0, 1.0], vector![0.01, 0.8]];
+
+    let handles = pos.map(|v| {
+        /* Create the bouncing ball. */
+        let rigid_body = RigidBodyBuilder::dynamic().translation(v).build();
+        let collider = ColliderBuilder::ball(0.05).restitution(0.95).build();
+        let ball_body_handle = rigid_body_set.insert(rigid_body);
+        collider_set.insert_with_parent(collider, ball_body_handle, &mut rigid_body_set);
+
+        ball_body_handle
+    });
 
     /* Create other structures necessary for the simulation. */
     let gravity = vector![0.0, -9.81];
@@ -36,6 +42,7 @@ fn bouncing_ball_inner() -> Robj {
     const LEN: usize = 300;
 
     let mut frame: Vec<i32> = Vec::with_capacity(LEN);
+    let mut index: Vec<i32> = Vec::with_capacity(LEN);
     let mut x: Vec<f32> = Vec::with_capacity(LEN);
     let mut y: Vec<f32> = Vec::with_capacity(LEN);
 
@@ -57,13 +64,18 @@ fn bouncing_ball_inner() -> Robj {
             &event_handler,
         );
 
-        let ball_body = &rigid_body_set[ball_body_handle];
-        frame.push(i as _);
-        x.push(ball_body.translation().x);
-        y.push(ball_body.translation().y);
+        for &h in &handles {
+            let ball_body = &rigid_body_set[h];
+            frame.push(i as _);
+            index.push(h.index() as _);
+            x.push(ball_body.translation().x);
+            y.push(ball_body.translation().y);
+        }
     }
 
-    result::ResultTibble { frame, x, y }.try_into().unwrap()
+    result::ResultTibble { frame, index, x, y }
+        .try_into()
+        .unwrap()
 }
 
 /// Return rapier results

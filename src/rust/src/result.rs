@@ -4,7 +4,10 @@ use std::convert::TryFrom;
 
 /// An intermediate form to convert to tibble.
 pub struct ResultTibble {
+    // Frame (the simulation usually runs at 60FPS)
     pub frame: Vec<i32>,
+    // Index of the object
+    pub index: Vec<i32>,
     // Unscaled position of x.
     pub x: Vec<f32>,
     // Unscaled position of y.
@@ -24,7 +27,12 @@ impl TryFrom<ResultTibble> for Robj {
             }
         };
 
-        let result = tibble.call(pairlist!(x = value.x, y = value.y,))?;
+        let result = tibble.call(pairlist!(
+            frame = value.frame,
+            index = value.index,
+            x = value.x,
+            y = value.y,
+        ))?;
 
         Ok(result)
     }

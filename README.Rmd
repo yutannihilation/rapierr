@@ -43,12 +43,13 @@ library(ggplot2)
 d <- bouncing_ball()
 
 p <- ggplot() +
-  ggforce::geom_circle(aes(x0 = x, y0 = y, r = 0.05)) +
+  ggforce::geom_circle(aes(x0 = x, y0 = y, r = 0.05, fill = index)) +
   scale_size_identity() +
   theme_minimal() +
+  theme(legend.position = "none") +
   coord_equal(xlim = c(-0.5, 0.5), ylim = c(0, 1))
 
 for (i in seq_len(nrow(d))) {
-  plot(p %+% d[i, ])
+  plot(p %+% dplyr::filter(d, frame == {{ i }}))
 }
 ```
