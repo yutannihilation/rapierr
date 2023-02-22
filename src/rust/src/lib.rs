@@ -9,7 +9,10 @@ fn bouncing_ball_inner() -> Robj {
 
     /* Create the ground. */
     let collider_bottom = ColliderBuilder::cuboid(100.0, 0.0).build();
-    let collider_left = ColliderBuilder::cuboid(-0.5, 100.0).build();
+    let collider_left = ColliderBuilder::cuboid(100.0, 0.0)
+        .rotation(90.0)
+        .translation(vector![-0.1, 0.0])
+        .build();
     collider_set.insert(collider_bottom);
     collider_set.insert(collider_left);
 
@@ -39,7 +42,7 @@ fn bouncing_ball_inner() -> Robj {
     let physics_hooks = ();
     let event_handler = ();
 
-    const LEN: usize = 300;
+    const LEN: usize = 100;
 
     let mut frame: Vec<i32> = Vec::with_capacity(LEN);
     let mut index: Vec<i32> = Vec::with_capacity(LEN);
