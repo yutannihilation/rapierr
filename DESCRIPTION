@@ -1,5 +1,5 @@
 Package: rapierr
-Title: Rapier 2D for R
+Title: 'Rapier' 2D Physics Engine for R
 Version: 0.0.0.9000
 Authors@R: 
     c(person(given = "Hiroaki",
@@ -8,10 +8,12 @@ Authors@R:
              email = "yutani.ini@gmail.com",
              comment = c(ORCID = "0000-0002-3385-7233")))
 Description: Play with 2D physics with 'Rapier' Rust crate.
+Imports: 
+    tibble
+Depends: 
+    R (>= 4.2.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Config/rextendr/version: 0.2.0.9000
-Imports: 
-    tibble

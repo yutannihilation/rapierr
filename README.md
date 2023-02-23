@@ -8,6 +8,14 @@ Bring Rapier 2D functionality to R
 <!-- badges: start -->
 <!-- badges: end -->
 
+:warning: :warning: :warning: :warning: :warning: :warning: :warning:
+:warning: :warning: :warning:
+
+Don’t expect this package to work at the moment.
+
+:warning: :warning: :warning: :warning: :warning: :warning: :warning:
+:warning: :warning: :warning:
+
 ## What is Rapier?
 
 [Rapier](https://github.com/dimforge/rapier) is the 2D and 3D physics
