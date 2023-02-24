@@ -43,20 +43,29 @@ world$add_fixed_polyline(-50.0, 0.0, 50.0, 0.0, 0.70);
 # left wall
 world$add_fixed_polyline(-0.3, 0.0, -0.2, 100.0, 0.70);
 
-world$add_ball(0.0, 1.0, 0.08, 0.97)
-world$add_ball(0.01, 1.2, 0.08, 0.97)
 world$add_ball(0.02, 0.6, 0.08, 0.97)
 world$add_ball(-0.01, 0.5, 0.08, 0.97)
 world$add_ball(-0.02, 0.8, 0.08, 0.97)
 
-d <- world$step(200)
+d1 <- world$step(50)
+
+# Add more balls
+world$add_ball(0.0, 1.0, 0.08, 0.97)
+world$add_ball(0.01, 1.2, 0.08, 0.97)
+
+d2 <- world$step(150)
+
+d <- dplyr::bind_rows(d1, d2)
+d$index <- factor(d$index)
 
 p <- ggplot() +
   ggforce::geom_circle(aes(x0 = x, y0 = y, r = 0.08, fill = index)) +
   scale_size_identity() +
+  coord_equal(xlim = c(-0.5, 0.5), ylim = c(0, 1)) +
+  scale_fill_viridis_d(NULL, option = "F", drop = FALSE) +
+  ggtitle("Physiiiiics!!!!") +
   theme_minimal() +
-  theme(legend.position = "none") +
-  coord_equal(xlim = c(-0.5, 0.5), ylim = c(0, 1))
+  theme(text = element_text(size = 20))
 
 for (frame in seq_len(max(d$frame))) {
   plot(p %+% dplyr::filter(d, frame == {{ frame }}))
@@ -64,3 +73,7 @@ for (frame in seq_len(max(d$frame))) {
 ```
 
 <img src="man/figures/README-bouncing_ball-.gif" width="100%" />
+
+## Similar Projects
+
+- [chipmunkcore](https://github.com/coolbutuseless/chipmunkcore)

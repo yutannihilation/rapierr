@@ -4,6 +4,7 @@ use rapier2d::{na::Vector2, parry::partitioning::IndexedData, prelude::*};
 mod result;
 
 pub struct Rapier2DWorld {
+    cur_step: usize,
     physics_pipeline: PhysicsPipeline,
     gravity: rapier2d::na::Vector2<f32>,
     integration_parameters: IntegrationParameters,
@@ -30,6 +31,7 @@ impl Rapier2DWorld {
 
     pub fn new() -> Self {
         Self {
+            cur_step: 0,
             physics_pipeline: PhysicsPipeline::new(),
             gravity: Self::GRAVITY,
             integration_parameters: IntegrationParameters::default(),
@@ -55,7 +57,7 @@ impl Rapier2DWorld {
 
         let mut i = 0_usize;
 
-        for f in 0..n {
+        for _ in 0..n {
             self.physics_pipeline.step(
                 &self.gravity,
                 &self.integration_parameters,
@@ -74,13 +76,15 @@ impl Rapier2DWorld {
 
             for &h in &self.body_handles {
                 let ball_body = &self.bodies.get(h).unwrap();
-                frame.set_elt(i, (f as i32).into());
+                frame.set_elt(i, (self.cur_step as i32).into());
                 index.set_elt(i, (h.index() as i32).into());
                 x.set_elt(i, (ball_body.translation().x as f64).into());
                 y.set_elt(i, (ball_body.translation().y as f64).into());
 
                 i += 1;
             }
+
+            self.cur_step += 1;
         }
 
         result::ResultTibble { frame, index, x, y }
