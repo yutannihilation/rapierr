@@ -3,5 +3,4 @@
 S3method("$",Rapier2DWorld)
 S3method("[[",Rapier2DWorld)
 export(Rapier2DWorld)
-export(bouncing_ball)
 useDynLib(rapierr, .registration = TRUE)

@@ -51,28 +51,32 @@ library(ggplot2)
 world <- Rapier2DWorld$new()
 
 # ground
-world$add_fixed_polyline(-50.0, 0.0, 50.0, 0.0, 0.70);
+world$add_fixed_segment(-50.0, 0.0, 50.0, 0.0, 0.70);
 
-# left wall
-world$add_fixed_polyline(-0.3, 0.0, -0.2, 100.0, 0.70);
+world$add_line(-0.2, 0.7, 0.2, 0.7, 0.7);
 
-world$add_ball(0.02, 0.6, 0.08, 0.97)
-world$add_ball(-0.01, 0.5, 0.08, 0.97)
-world$add_ball(-0.02, 0.8, 0.08, 0.97)
+world$add_ball( 0.1, 0.9, 0.08, 0.97)
+world$add_ball(-0.1, 0.4, 0.08, 0.97)
 
-d1 <- world$step(50)
+d1 <- world$step(30)
 
 # Add more balls
-world$add_ball(0.0, 1.0, 0.08, 0.97)
-world$add_ball(0.01, 1.2, 0.08, 0.97)
+world$add_ball( 0.0, 1.0, 0.08, 0.97)
+world$add_ball(-0.2, 0.9, 0.08, 0.97)
 
-d2 <- world$step(150)
+d2 <- world$step(120)
 
 d <- dplyr::bind_rows(d1, d2)
 d$index <- factor(d$index)
 
 p <- ggplot() +
-  ggforce::geom_circle(aes(x0 = x, y0 = y, r = 0.08, fill = index)) +
+  ggforce::geom_circle(data = \(x) dplyr::filter(x, index != 0L),
+                       aes(x0 = x, y0 = y, r = 0.08, fill = index)) +
+  geom_segment(data = \(x) dplyr::filter(x, index == 0L),
+               aes(x    = x - 0.4 * cos(angle),
+                   y    = y - 0.4 * sin(angle),
+                   xend = x + 0.4 * cos(angle),
+                   yend = y + 0.4 * sin(angle))) +
   scale_size_identity() +
   coord_equal(xlim = c(-0.5, 0.5), ylim = c(0, 1)) +
   scale_fill_viridis_d(NULL, option = "F", drop = FALSE) +

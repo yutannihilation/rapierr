@@ -11,10 +11,6 @@
 #' @useDynLib rapierr, .registration = TRUE
 NULL
 
-#' Return rapier results
-#' @export
-bouncing_ball <- function() .Call(wrap__bouncing_ball)
-
 #' The 2D World of Rapier
 #'
 #' @export
@@ -26,9 +22,9 @@ Rapier2DWorld$step <- function(n) .Call(wrap__Rapier2DWorld__step, self, n)
 
 Rapier2DWorld$add_ball <- function(x, y, radius, restitution) invisible(.Call(wrap__Rapier2DWorld__add_ball, self, x, y, radius, restitution))
 
-Rapier2DWorld$add_fixed_line <- function(x, y, w, h, angle, restitution) invisible(.Call(wrap__Rapier2DWorld__add_fixed_line, self, x, y, w, h, angle, restitution))
+Rapier2DWorld$add_line <- function(x0, y0, x1, y1, restitution) invisible(.Call(wrap__Rapier2DWorld__add_line, self, x0, y0, x1, y1, restitution))
 
-Rapier2DWorld$add_fixed_polyline <- function(x0, y0, x1, y1, restitution) invisible(.Call(wrap__Rapier2DWorld__add_fixed_polyline, self, x0, y0, x1, y1, restitution))
+Rapier2DWorld$add_fixed_segment <- function(x0, y0, x1, y1, restitution) invisible(.Call(wrap__Rapier2DWorld__add_fixed_segment, self, x0, y0, x1, y1, restitution))
 
 Rapier2DWorld$object_count <- function() .Call(wrap__Rapier2DWorld__object_count, self)
 

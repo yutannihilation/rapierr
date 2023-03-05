@@ -1,5 +1,6 @@
 use extendr_api::prelude::*;
-use rapier2d::{na::Vector2, parry::partitioning::IndexedData, prelude::*};
+use rapier2d::na;
+use rapier2d::{parry::partitioning::IndexedData, prelude::*};
 
 mod result;
 
@@ -27,7 +28,7 @@ pub struct Rapier2DWorld {
 /// @export
 #[extendr(use_try_from = true)]
 impl Rapier2DWorld {
-    const GRAVITY: Vector2<f32> = vector![0.0, -9.81];
+    const GRAVITY: na::Vector2<f32> = vector![0.0, -9.81];
 
     pub fn new() -> Self {
         Self {
@@ -54,6 +55,7 @@ impl Rapier2DWorld {
         let mut index = extendr_api::Integers::new(n * self.object_count());
         let mut x = extendr_api::Doubles::new(n * self.object_count());
         let mut y = extendr_api::Doubles::new(n * self.object_count());
+        let mut angle = extendr_api::Doubles::new(n * self.object_count());
 
         let mut i = 0_usize;
 
@@ -75,11 +77,12 @@ impl Rapier2DWorld {
             );
 
             for &h in &self.body_handles {
-                let ball_body = &self.bodies.get(h).unwrap();
+                let body = &self.bodies.get(h).unwrap();
                 frame.set_elt(i, (self.cur_step as i32).into());
                 index.set_elt(i, (h.index() as i32).into());
-                x.set_elt(i, (ball_body.translation().x as f64).into());
-                y.set_elt(i, (ball_body.translation().y as f64).into());
+                x.set_elt(i, (body.translation().x as f64).into());
+                y.set_elt(i, (body.translation().y as f64).into());
+                angle.set_elt(i, (body.rotation().angle() as f64).into());
 
                 i += 1;
             }
@@ -87,9 +90,15 @@ impl Rapier2DWorld {
             self.cur_step += 1;
         }
 
-        result::ResultTibble { frame, index, x, y }
-            .try_into()
-            .unwrap()
+        result::ResultTibble {
+            frame,
+            index,
+            x,
+            y,
+            angle,
+        }
+        .try_into()
+        .unwrap()
     }
 
     pub fn add_ball(&mut self, x: f32, y: f32, radius: f32, restitution: f32) {
@@ -106,20 +115,34 @@ impl Rapier2DWorld {
         self.body_handles.push(ball_body_handle);
     }
 
-    pub fn add_fixed_line(&mut self, x: f32, y: f32, w: f32, h: f32, angle: f32, restitution: f32) {
-        let collider = ColliderBuilder::cuboid(w, h)
-            .translation(vector![x, y])
+    pub fn add_line(&mut self, x0: f32, y0: f32, x1: f32, y1: f32, restitution: f32) {
+        let p0 = point![x0, y0];
+        let p1 = point![x1, y1];
+        let length = na::distance(&p0, &p1);
+        let angle = (p1 - p0).angle(&na::Vector2::x());
+
+        let rigid_body = RigidBodyBuilder::dynamic()
             .rotation(angle)
+            .translation(p0 - point![-length / 2., 0.])
+            .ccd_enabled(true)
+            .build();
+
+        let collider = ColliderBuilder::cuboid(length / 2., 0.01)
             .restitution(restitution)
             .build();
 
-        self.colliders.insert(collider);
+        let line_body_handle = self.bodies.insert(rigid_body);
+        self.colliders
+            .insert_with_parent(collider, line_body_handle, &mut self.bodies);
+        self.body_handles.push(line_body_handle);
     }
 
-    pub fn add_fixed_polyline(&mut self, x0: f32, y0: f32, x1: f32, y1: f32, restitution: f32) {
-        let collider = ColliderBuilder::polyline(vec![point![x0, y0], point![x1, y1]], None)
+    pub fn add_fixed_segment(&mut self, x0: f32, y0: f32, x1: f32, y1: f32, restitution: f32) {
+        let collider = ColliderBuilder::segment(point![x0, y0], point![x1, y1])
             .restitution(restitution)
             .build();
+        let pos = collider.position();
+        rprintln!("{:?}", pos);
 
         self.colliders.insert(collider);
     }
@@ -135,37 +158,10 @@ impl Default for Rapier2DWorld {
     }
 }
 
-fn bouncing_ball_inner() -> Robj {
-    let mut world = Rapier2DWorld::new();
-
-    // ground
-    world.add_fixed_polyline(-50.0, 0.0, 50.0, 0.0, 0.70);
-    // wall on left
-    world.add_fixed_polyline(-0.2, 0.0, -0.2, 100.0, 0.70);
-
-    world.add_ball(0.0, 1.0, 0.08, 0.97);
-    world.add_ball(0.01, 1.2, 0.08, 0.97);
-    world.add_ball(0.02, 0.8, 0.08, 0.97);
-    world.add_ball(0.03, 0.6, 0.08, 0.97);
-    world.add_ball(-0.01, 0.5, 0.08, 0.97);
-
-    const FRAMES: i32 = 200;
-
-    world.step(FRAMES)
-}
-
-/// Return rapier results
-/// @export
-#[extendr(use_try_from = true)]
-fn bouncing_ball() -> Robj {
-    bouncing_ball_inner()
-}
-
 // Macro to generate exports.
 // This ensures exported functions are registered with R.
 // See corresponding C code in `entrypoint.c`.
 extendr_module! {
     mod rapierr;
-    fn bouncing_ball;
     impl Rapier2DWorld;
 }

@@ -12,6 +12,8 @@ pub struct ResultTibble {
     pub x: Doubles,
     // Unscaled position of y.
     pub y: Doubles,
+    // Angle of the object
+    pub angle: Doubles,
 }
 
 impl TryFrom<ResultTibble> for Robj {
@@ -32,6 +34,7 @@ impl TryFrom<ResultTibble> for Robj {
             index = value.index,
             x = value.x,
             y = value.y,
+            angle = value.angle,
         ))?;
 
         Ok(result)
