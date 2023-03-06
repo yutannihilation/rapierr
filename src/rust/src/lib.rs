@@ -55,6 +55,7 @@ impl Rapier2DWorld {
         let mut index = extendr_api::Integers::new(n * self.object_count());
         let mut x = extendr_api::Doubles::new(n * self.object_count());
         let mut y = extendr_api::Doubles::new(n * self.object_count());
+        let mut size = extendr_api::Doubles::new(n * self.object_count());
         let mut angle = extendr_api::Doubles::new(n * self.object_count());
 
         let mut i = 0_usize;
@@ -84,6 +85,15 @@ impl Rapier2DWorld {
                 y.set_elt(i, (body.translation().y as f64).into());
                 angle.set_elt(i, (body.rotation().angle() as f64).into());
 
+                let b = self.bodies.get(h).unwrap();
+                let c = self.colliders.get(b.colliders()[0]).unwrap();
+                let len = match c.shape().as_typed_shape() {
+                    TypedShape::Ball(ball) => ball.radius,
+                    TypedShape::Cuboid(cuboid) => cuboid.half_extents.x * 2.,
+                    _ => unreachable!("Unknown shape!"),
+                };
+                size.set_elt(i, (len as f64).into());
+
                 i += 1;
             }
 
@@ -95,6 +105,7 @@ impl Rapier2DWorld {
             index,
             x,
             y,
+            size,
             angle,
         }
         .try_into()
@@ -104,6 +115,7 @@ impl Rapier2DWorld {
     pub fn add_ball(&mut self, x: f32, y: f32, radius: f32, restitution: f32) {
         let rigid_body = RigidBodyBuilder::dynamic()
             .translation(vector![x, y])
+            .ccd_enabled(true)
             .build();
         let collider = ColliderBuilder::ball(radius)
             .restitution(restitution)
@@ -118,17 +130,19 @@ impl Rapier2DWorld {
     pub fn add_line(&mut self, x0: f32, y0: f32, x1: f32, y1: f32, restitution: f32) {
         let p0 = point![x0, y0];
         let p1 = point![x1, y1];
-        let length = na::distance(&p0, &p1);
-        let angle = (p1 - p0).angle(&na::Vector2::x());
+        let v = p1 - p0;
+        let length = v.norm();
+        let angle = v.y.atan2(v.x);
 
         let rigid_body = RigidBodyBuilder::dynamic()
             .rotation(angle)
-            .translation(p0 - point![-length / 2., 0.])
+            .translation(p0.coords + 0.5 * v)
             .ccd_enabled(true)
             .build();
 
         let collider = ColliderBuilder::cuboid(length / 2., 0.01)
             .restitution(restitution)
+            .restitution_combine_rule(CoefficientCombineRule::Multiply)
             .build();
 
         let line_body_handle = self.bodies.insert(rigid_body);
@@ -148,7 +162,19 @@ impl Rapier2DWorld {
     }
 
     fn object_count(&self) -> usize {
-        self.body_handles.len()
+        self.body_handles
+            .iter()
+            .map(|h| {
+                let b = self.bodies.get(*h).unwrap();
+                let c = self.colliders.get(b.colliders()[0]).unwrap();
+                // TODO
+                match c.shape().as_typed_shape() {
+                    TypedShape::Ball(_) => 1,
+                    TypedShape::Cuboid(_) => 1,
+                    _ => unreachable!("Unknown shape!"),
+                }
+            })
+            .sum::<usize>()
     }
 }
 

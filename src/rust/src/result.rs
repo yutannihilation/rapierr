@@ -12,6 +12,8 @@ pub struct ResultTibble {
     pub x: Doubles,
     // Unscaled position of y.
     pub y: Doubles,
+    // Size of the object (radius of a ball, and width of the cuboid).
+    pub size: Doubles,
     // Angle of the object
     pub angle: Doubles,
 }
@@ -34,6 +36,7 @@ impl TryFrom<ResultTibble> for Robj {
             index = value.index,
             x = value.x,
             y = value.y,
+            size = value.size,
             angle = value.angle,
         ))?;
 
